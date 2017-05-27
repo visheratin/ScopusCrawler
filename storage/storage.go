@@ -9,25 +9,33 @@ type GenericStorage interface {
 	CreateAuthor(author crawler.Author) error
 	UpdateAuthor(author crawler.Author) error
 	GetAuthor(scopusID string) (crawler.Author, error)
+	SearchAuthors(fields map[string]string) ([]crawler.Author, error)
 	DeleteAuthor(scopusID string) error
 
 	CreateAffiliation(affiliation crawler.Affiliation) error
 	UpdateAffiliation(affiliation crawler.Affiliation) error
 	GetAffiliation(scopusID string) (crawler.Affiliation, error)
+	SearchAffiliations(fields map[string]string) ([]crawler.Affiliation, error)
 	DeleteAffiliation(scopusID string) error
 
 	CreateArticle(article crawler.Article) error
 	UpdateArticle(article crawler.Article) error
 	GetArticle(scopusID string) (crawler.Article, error)
+	SearchArticles(fields map[string]string) ([]crawler.Article, error)
 	DeleteArticle(scopusID string) error
 
 	CreateSubjectArea(article crawler.Article) error
 	UpdateSubjectArea(article crawler.Article) error
 	GetSubjectArea(scopusID string) (crawler.SubjectArea, error)
+	SearchSubjectAreas(fields map[string]string) ([]crawler.SubjectArea, error)
 	DeleteSubjectArea(scopusID string) error
 
 	CreateKeyword(keyword crawler.Keyword) error
 	UpdateKeyword(article crawler.Keyword) error
 	GetKeyword(id string) (crawler.Keyword, error)
+	SearchKeywords(fields map[string]string) ([]crawler.Keyword, error)
 	DeleteKeyword(id string) error
+
+	CreateFinishedRequest(request string) error
+	CheckFinishedRequest(request string) (bool, error)
 }

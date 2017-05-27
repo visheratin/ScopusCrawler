@@ -45,3 +45,14 @@ type Keyword struct {
 	ID    string
 	Value string
 }
+
+type DataSource struct {
+	Name string
+	Path string
+	Keys []string
+}
+
+type SearchRequest struct {
+	SourceName string
+	Fields     map[string]string
+}

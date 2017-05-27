@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	logger.InitLog()
+	logger.Init()
 	config.InitKeys("key.txt")
 	address := "http://api.elsevier.com/content/serial/title"
 	params := map[string]string{}

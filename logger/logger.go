@@ -13,7 +13,7 @@ var (
 	Error *log.Logger
 )
 
-func InitLog() {
+func Init() {
 	config := config.ReadConfig("")
 	logPath := config.LogPath + "log.txt"
 	file, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)

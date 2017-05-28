@@ -6,8 +6,12 @@ import (
 	"net/http"
 )
 
-func MakeQuery(address string, params map[string]string) (map[string]interface{}, error) {
-	requestPath := address + "?"
+func MakeQuery(address string, id string, params map[string]string) (map[string]interface{}, error) {
+	requestPath := address
+	if id != "" {
+		requestPath = requestPath + "/" + id
+	}
+	requestPath = requestPath + "?"
 	for key, value := range params {
 		requestPath += key + "=" + value + "&"
 	}

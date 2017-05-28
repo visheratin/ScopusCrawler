@@ -7,8 +7,10 @@ import (
 )
 
 type Configuration struct {
-	ListenPort string
-	LogPath    string
+	ListenPort     string
+	LogPath        string
+	MaxSearchPages int
+	ResultsPerPage int
 }
 
 var (

@@ -54,5 +54,6 @@ type DataSource struct {
 
 type SearchRequest struct {
 	SourceName string
+	ID         string
 	Fields     map[string]string
 }

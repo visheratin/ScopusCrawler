@@ -1,0 +1,7 @@
+[
+    {
+        "name": "articles",
+        "path": "http://api.elsevier.com/content/search/scopus",
+        "keys": ["query", "date", "sort", "subj"]
+    }
+]

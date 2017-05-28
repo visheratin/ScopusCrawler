@@ -1,4 +1,6 @@
 {
 	"logPath":"D:\\log\\",
-	"listenPort": "12345"
+	"listenPort": "12345",
+	"maxSearchPages": 200,
+	"resultsPerPage": 25
 }

@@ -13,8 +13,11 @@ var (
 	Error *log.Logger
 )
 
-func Init() {
-	config := config.ReadConfig("")
+func Init() error {
+	config, err := config.ReadConfig("")
+	if err != nil {
+		return err
+	}
 	logPath := config.LogPath + "log.txt"
 	file, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	traceW := io.Writer(os.Stdout)
@@ -33,4 +36,5 @@ func Init() {
 	Error = log.New(errorW,
 		"[ERROR]: ",
 		log.Ldate|log.Ltime|log.Lshortfile)
+	return nil
 }

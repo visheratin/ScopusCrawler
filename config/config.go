@@ -17,21 +17,21 @@ var (
 	defaultConfigPath = "config.json"
 )
 
-func ReadConfig(configPath string) Configuration {
+func ReadConfig(configPath string) (Configuration, error) {
 	if configPath == "" {
 		configPath = defaultConfigPath
 	}
 	file, err := os.Open(configPath)
 	if err != nil {
 		fmt.Println("Unable to open configuration file.")
-		return defaultConfig
+		return defaultConfig, err
 	}
 	decoder := json.NewDecoder(file)
 	var config Configuration
 	err = decoder.Decode(&config)
 	if err != nil {
 		fmt.Println(err)
-		return defaultConfig
+		return defaultConfig, err
 	}
-	return config
+	return config, nil
 }

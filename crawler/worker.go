@@ -34,7 +34,7 @@ func (worker *Worker) Start() {
 					logger.Error.Println(err)
 					return
 				}
-				articles, err := ExtractArticles(data)
+				articles, err := worker.ExtractArticles(data)
 				if err != nil {
 					logger.Error.Println(err)
 					return
@@ -58,7 +58,7 @@ func (worker *Worker) Start() {
 	}()
 }
 
-func ExtractArticles(rawResponse map[string]interface{}) ([]models.Article, error) {
+func (worker *Worker) ExtractArticles(rawResponse map[string]interface{}) ([]models.Article, error) {
 	result := []models.Article{}
 	searchContainer, searchSucceed := rawResponse["search-results"]
 	if searchSucceed {

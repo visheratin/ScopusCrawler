@@ -5,97 +5,104 @@ import (
 	"errors"
 	"fmt"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/visheratin/scopus-crawler/logger"
 	"github.com/visheratin/scopus-crawler/models"
 )
 
-type SQLiteStorage struct {
-	Path        string
+type MySQLStorage struct {
+	Address     string
+	User        string
+	Password    string
+	DbName      string
 	Initialized bool
 	DB          *sql.DB
 }
 
 const createAuthorsTable = `CREATE TABLE IF NOT EXISTS authors (
-	scopus_id VARCHAR PRIMARY KEY,
-	affiliation_id VARCHAR,
-	initials VARCHAR,
-	indexed_name VARCHAR,
-	surname VARCHAR,
-	name VARCHAR,
+	scopus_id VARCHAR(20),
+	affiliation_id VARCHAR(20),
+	initials TEXT,
+	indexed_name TEXT,
+	surname TEXT,
+	name TEXT,
+	PRIMARY KEY (scopus_id),
 	FOREIGN KEY(affiliation_id) REFERENCES affiliations(scopus_id)
 )`
 
 const createAffiliationsTable = `CREATE TABLE IF NOT EXISTS affiliations (
-	scopus_id VARCHAR PRIMARY KEY,
-	title VARCHAR,
-	country VARCHAR,
-	city VARCHAR,
-	state VARCHAR,
-	postal_code VARCHAR,
-	address VARCHAR
+	scopus_id VARCHAR(20),
+	title TEXT,
+	country TEXT,
+	city TEXT,
+	state TEXT,
+	postal_code TEXT,
+	address TEXT,
+    PRIMARY KEY (scopus_id)
 )`
 
 const createArticlesTable = `CREATE TABLE IF NOT EXISTS articles (
-	scopus_id VARCHAR PRIMARY KEY,
-	title VARCHAR,
-	abstracts VARCHAR,
-	publication_date VARCHAR,
+	scopus_id VARCHAR(20),
+	title TEXT,
+	abstracts TEXT,
+	publication_date TEXT,
 	citations_count INTEGER,
-	publication_type VARCHAR,
-	publication_title VARCHAR,
-	affiliation_id VARCHAR,
-	FOREIGN KEY(affiliation_id) REFERENCES affiliations(scopus_id)
+	publication_type TEXT,
+	publication_title TEXT,
+	PRIMARY KEY (scopus_id)
 )`
 
 const createSubjectAreasTable = `CREATE TABLE IF NOT EXISTS subject_areas (
-	scopus_id VARCHAR PRIMARY KEY,
-	title VARCHAR,
-	code VARCHAR,
-	description VARCHAR
+	scopus_id VARCHAR(20),
+	title TEXT,
+	code TEXT,
+	description TEXT,
+	PRIMARY KEY (scopus_id)
 )`
 
 const createKeywordsTable = `CREATE TABLE IF NOT EXISTS keywords (
-	id VARCHAR PRIMARY KEY,
-	keyword VARCHAR
+	id VARCHAR(20),
+	keyword TEXT,
+	PRIMARY KEY (id)
 )`
 
 const createArticleAuthorsTable = `CREATE TABLE IF NOT EXISTS article_author(
-	author_id VARCHAR,
-	article_id VARCHAR,
+	author_id VARCHAR(20),
+	article_id VARCHAR(20),
 	FOREIGN KEY(author_id) REFERENCES authors(scopus_id) ON DELETE CASCADE,
 	FOREIGN KEY(article_id) REFERENCES articles(scopus_id) ON DELETE CASCADE
 )`
 
 const createArticleArticlesTable = `CREATE TABLE IF NOT EXISTS article_article(
-	from_id VARCHAR,
-	to_id VARCHAR,
+	from_id VARCHAR(20),
+	to_id VARCHAR(20),
 	FOREIGN KEY(from_id) REFERENCES articles(scopus_id) ON DELETE CASCADE,
 	FOREIGN KEY(to_id) REFERENCES articles(scopus_id) ON DELETE CASCADE
 )`
 
 const createArticleAreasTable = `CREATE TABLE IF NOT EXISTS article_area(
-	area_id VARCHAR,
-	article_id VARCHAR,
+	area_id VARCHAR(20),
+	article_id VARCHAR(20),
 	FOREIGN KEY(article_id) REFERENCES articles(scopus_id) ON DELETE CASCADE,
 	FOREIGN KEY(area_id) REFERENCES subject_areas(scopus_id) ON DELETE CASCADE
 )`
 
 const createArticleKeywordsTable = `CREATE TABLE IF NOT EXISTS article_keyword(
-	keyword_id VARCHAR,
-	article_id VARCHAR,
+	keyword_id VARCHAR(20),
+	article_id VARCHAR(20),
 	FOREIGN KEY(article_id) REFERENCES articles(scopus_id) ON DELETE CASCADE,
 	FOREIGN KEY(keyword_id) REFERENCES keywords(id) ON DELETE CASCADE
 )`
 
 const createFinishedRequestsTable = `CREATE TABLE IF NOT EXISTS finished_requests(
-	request VARCHAR PRIMARY KEY,
-	response VARCHAR
+	request VARCHAR(256) PRIMARY KEY,
+	response TEXT
 )`
 
 // Init creates new storage or initializes the existing one
-func (storage SQLiteStorage) Init(keepAlive bool) error {
-	db, err := sql.Open("sqlite3", fmt.Sprintf("file:%s?cache=shared&mode=rwc", storage.Path))
+func (storage MySQLStorage) Init(keepAlive bool) error {
+	path := fmt.Sprintf("%s:%s@(%s)/%s", storage.User, storage.Password, storage.Address, storage.DbName)
+	db, err := sql.Open("mysql", path)
 	if err != nil {
 		return err
 	}
@@ -148,14 +155,14 @@ func (storage SQLiteStorage) Init(keepAlive bool) error {
 	return nil
 }
 
-func (storage SQLiteStorage) Close() {
+func (storage MySQLStorage) Close() {
 	if storage.DB != nil {
 		storage.DB.Close()
 	}
 	storage.Initialized = false
 }
 
-func (storage SQLiteStorage) getDBConnection() (*sql.DB, error) {
+func (storage MySQLStorage) getDBConnection() (*sql.DB, error) {
 	var err error
 	if !storage.Initialized {
 		err = storage.Init(false)
@@ -167,7 +174,8 @@ func (storage SQLiteStorage) getDBConnection() (*sql.DB, error) {
 	if storage.DB != nil {
 		db = storage.DB
 	} else {
-		db, err = sql.Open("sqlite3", fmt.Sprintf("file:%s?cache=shared&mode=rwc", storage.Path))
+		path := fmt.Sprintf("%s:%s@(%s)/%s", storage.User, storage.Password, storage.Address, storage.DbName)
+		db, err = sql.Open("mysql", path)
 		if err != nil {
 			return nil, err
 		}
@@ -175,7 +183,7 @@ func (storage SQLiteStorage) getDBConnection() (*sql.DB, error) {
 	return db, nil
 }
 
-func (storage SQLiteStorage) CreateAffiliation(affiliation models.Affiliation) error {
+func (storage MySQLStorage) CreateAffiliation(affiliation models.Affiliation) error {
 	db, err := storage.getDBConnection()
 	if err != nil {
 		return err
@@ -189,7 +197,7 @@ func (storage SQLiteStorage) CreateAffiliation(affiliation models.Affiliation) e
 	return nil
 }
 
-func (storage SQLiteStorage) UpdateAffiliation(affiliation models.Affiliation) error {
+func (storage MySQLStorage) UpdateAffiliation(affiliation models.Affiliation) error {
 	db, err := storage.getDBConnection()
 	if err != nil {
 		return err
@@ -205,7 +213,7 @@ func (storage SQLiteStorage) UpdateAffiliation(affiliation models.Affiliation) e
 	return nil
 }
 
-func (storage SQLiteStorage) GetAffiliation(scopusID string) (models.Affiliation, error) {
+func (storage MySQLStorage) GetAffiliation(scopusID string) (models.Affiliation, error) {
 	var affiliation models.Affiliation
 	db, err := storage.getDBConnection()
 	if err != nil {
@@ -228,7 +236,7 @@ func (storage SQLiteStorage) GetAffiliation(scopusID string) (models.Affiliation
 	return affiliation, errors.New("data was not found in the storage")
 }
 
-func (storage SQLiteStorage) SearchAffiliations(fields map[string]string) ([]models.Affiliation, error) {
+func (storage MySQLStorage) SearchAffiliations(fields map[string]string) ([]models.Affiliation, error) {
 	var affiliations []models.Affiliation
 	db, err := storage.getDBConnection()
 	if err != nil {
@@ -255,7 +263,7 @@ func (storage SQLiteStorage) SearchAffiliations(fields map[string]string) ([]mod
 	return affiliations, nil
 }
 
-func (storage SQLiteStorage) DeleteAffiliation(scopusID string) error {
+func (storage MySQLStorage) DeleteAffiliation(scopusID string) error {
 	db, err := storage.getDBConnection()
 	if err != nil {
 		return err
@@ -267,7 +275,7 @@ func (storage SQLiteStorage) DeleteAffiliation(scopusID string) error {
 	}
 	return nil
 }
-func (storage SQLiteStorage) CreateArticle(article models.Article) error {
+func (storage MySQLStorage) CreateArticle(article models.Article) error {
 	db, err := storage.getDBConnection()
 	if err != nil {
 		return err
@@ -338,7 +346,7 @@ func (storage SQLiteStorage) CreateArticle(article models.Article) error {
 	return nil
 }
 
-func (storage SQLiteStorage) UpdateArticle(article models.Article) error {
+func (storage MySQLStorage) UpdateArticle(article models.Article) error {
 	db, err := storage.getDBConnection()
 	if err != nil {
 		return err
@@ -355,7 +363,7 @@ func (storage SQLiteStorage) UpdateArticle(article models.Article) error {
 	return nil
 }
 
-func (storage SQLiteStorage) GetArticle(scopusID string) (models.Article, error) {
+func (storage MySQLStorage) GetArticle(scopusID string) (models.Article, error) {
 	var article models.Article
 	db, err := storage.getDBConnection()
 	if err != nil {
@@ -379,7 +387,7 @@ func (storage SQLiteStorage) GetArticle(scopusID string) (models.Article, error)
 	return article, errors.New("data was not found in the storage")
 }
 
-func (storage SQLiteStorage) SearchArticles(fields map[string]string) ([]models.Article, error) {
+func (storage MySQLStorage) SearchArticles(fields map[string]string) ([]models.Article, error) {
 	var articles []models.Article
 	db, err := storage.getDBConnection()
 	if err != nil {
@@ -407,7 +415,7 @@ func (storage SQLiteStorage) SearchArticles(fields map[string]string) ([]models.
 	return articles, nil
 }
 
-func (storage SQLiteStorage) DeleteArticle(scopusID string) error {
+func (storage MySQLStorage) DeleteArticle(scopusID string) error {
 	db, err := storage.getDBConnection()
 	if err != nil {
 		return err
@@ -420,7 +428,7 @@ func (storage SQLiteStorage) DeleteArticle(scopusID string) error {
 	return nil
 }
 
-func (storage SQLiteStorage) CreateAuthor(author models.Author) error {
+func (storage MySQLStorage) CreateAuthor(author models.Author) error {
 	db, err := storage.getDBConnection()
 	if err != nil {
 		return err
@@ -434,7 +442,7 @@ func (storage SQLiteStorage) CreateAuthor(author models.Author) error {
 	return nil
 }
 
-func (storage SQLiteStorage) UpdateAuthor(author models.Author) error {
+func (storage MySQLStorage) UpdateAuthor(author models.Author) error {
 	db, err := storage.getDBConnection()
 	if err != nil {
 		return err
@@ -450,7 +458,7 @@ func (storage SQLiteStorage) UpdateAuthor(author models.Author) error {
 	return nil
 }
 
-func (storage SQLiteStorage) GetAuthor(scopusID string) (models.Author, error) {
+func (storage MySQLStorage) GetAuthor(scopusID string) (models.Author, error) {
 	var author models.Author
 	db, err := storage.getDBConnection()
 	if err != nil {
@@ -472,7 +480,7 @@ func (storage SQLiteStorage) GetAuthor(scopusID string) (models.Author, error) {
 	return author, errors.New("data was not found in the storage")
 }
 
-func (storage SQLiteStorage) SearchAuthors(fields map[string]string) ([]models.Author, error) {
+func (storage MySQLStorage) SearchAuthors(fields map[string]string) ([]models.Author, error) {
 	var authors []models.Author
 	db, err := storage.getDBConnection()
 	if err != nil {
@@ -499,7 +507,7 @@ func (storage SQLiteStorage) SearchAuthors(fields map[string]string) ([]models.A
 	return authors, nil
 }
 
-func (storage SQLiteStorage) DeleteAuthor(scopusID string) error {
+func (storage MySQLStorage) DeleteAuthor(scopusID string) error {
 	db, err := storage.getDBConnection()
 	if err != nil {
 		return err
@@ -512,7 +520,7 @@ func (storage SQLiteStorage) DeleteAuthor(scopusID string) error {
 	return nil
 }
 
-func (storage SQLiteStorage) CreateFinishedRequest(request string, response string) error {
+func (storage MySQLStorage) CreateFinishedRequest(request string, response string) error {
 	db, err := storage.getDBConnection()
 	if err != nil {
 		return err
@@ -525,7 +533,7 @@ func (storage SQLiteStorage) CreateFinishedRequest(request string, response stri
 	return nil
 }
 
-func (storage SQLiteStorage) GetFinishedRequest(request string) (string, error) {
+func (storage MySQLStorage) GetFinishedRequest(request string) (string, error) {
 	db, err := storage.getDBConnection()
 	if err != nil {
 		return "", err
@@ -545,7 +553,7 @@ func (storage SQLiteStorage) GetFinishedRequest(request string) (string, error) 
 	return "", nil
 }
 
-func (storage SQLiteStorage) CreateKeyword(keyword models.Keyword) error {
+func (storage MySQLStorage) CreateKeyword(keyword models.Keyword) error {
 	db, err := storage.getDBConnection()
 	if err != nil {
 		return err
@@ -558,7 +566,7 @@ func (storage SQLiteStorage) CreateKeyword(keyword models.Keyword) error {
 	return nil
 }
 
-func (storage SQLiteStorage) UpdateKeyword(keyword models.Keyword) error {
+func (storage MySQLStorage) UpdateKeyword(keyword models.Keyword) error {
 	db, err := storage.getDBConnection()
 	if err != nil {
 		return err
@@ -571,7 +579,7 @@ func (storage SQLiteStorage) UpdateKeyword(keyword models.Keyword) error {
 	return nil
 }
 
-func (storage SQLiteStorage) GetKeyword(id string) (models.Keyword, error) {
+func (storage MySQLStorage) GetKeyword(id string) (models.Keyword, error) {
 	var keyword models.Keyword
 	db, err := storage.getDBConnection()
 	if err != nil {
@@ -593,7 +601,7 @@ func (storage SQLiteStorage) GetKeyword(id string) (models.Keyword, error) {
 	return keyword, errors.New("data was not found in the storage")
 }
 
-func (storage SQLiteStorage) SearchKeywords(fields map[string]string) ([]models.Keyword, error) {
+func (storage MySQLStorage) SearchKeywords(fields map[string]string) ([]models.Keyword, error) {
 	var keywords []models.Keyword
 	db, err := storage.getDBConnection()
 	if err != nil {
@@ -619,7 +627,7 @@ func (storage SQLiteStorage) SearchKeywords(fields map[string]string) ([]models.
 	return keywords, nil
 }
 
-func (storage SQLiteStorage) DeleteKeyword(id string) error {
+func (storage MySQLStorage) DeleteKeyword(id string) error {
 	db, err := storage.getDBConnection()
 	if err != nil {
 		return err
@@ -632,7 +640,7 @@ func (storage SQLiteStorage) DeleteKeyword(id string) error {
 	return nil
 }
 
-func (storage SQLiteStorage) CreateSubjectArea(subjectArea models.SubjectArea) error {
+func (storage MySQLStorage) CreateSubjectArea(subjectArea models.SubjectArea) error {
 	db, err := storage.getDBConnection()
 	if err != nil {
 		return err
@@ -645,7 +653,7 @@ func (storage SQLiteStorage) CreateSubjectArea(subjectArea models.SubjectArea) e
 	return nil
 }
 
-func (storage SQLiteStorage) UpdateSubjectArea(subjectArea models.SubjectArea) error {
+func (storage MySQLStorage) UpdateSubjectArea(subjectArea models.SubjectArea) error {
 	db, err := storage.getDBConnection()
 	if err != nil {
 		return err
@@ -660,7 +668,7 @@ func (storage SQLiteStorage) UpdateSubjectArea(subjectArea models.SubjectArea) e
 	return nil
 }
 
-func (storage SQLiteStorage) GetSubjectArea(scopusID string) (models.SubjectArea, error) {
+func (storage MySQLStorage) GetSubjectArea(scopusID string) (models.SubjectArea, error) {
 	var subjectArea models.SubjectArea
 	db, err := storage.getDBConnection()
 	if err != nil {
@@ -683,7 +691,7 @@ func (storage SQLiteStorage) GetSubjectArea(scopusID string) (models.SubjectArea
 	return subjectArea, errors.New("data was not found in the storage")
 }
 
-func (storage SQLiteStorage) SearchSubjectAreas(fields map[string]string) ([]models.SubjectArea, error) {
+func (storage MySQLStorage) SearchSubjectAreas(fields map[string]string) ([]models.SubjectArea, error) {
 	var subjectAreas []models.SubjectArea
 	db, err := storage.getDBConnection()
 	if err != nil {
@@ -710,7 +718,7 @@ func (storage SQLiteStorage) SearchSubjectAreas(fields map[string]string) ([]mod
 	return subjectAreas, nil
 }
 
-func (storage SQLiteStorage) DeleteSubjectArea(scopusID string) error {
+func (storage MySQLStorage) DeleteSubjectArea(scopusID string) error {
 	db, err := storage.getDBConnection()
 	if err != nil {
 		return err

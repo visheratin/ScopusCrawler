@@ -21,7 +21,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	Storage = storage.SQLiteStorage{Path: "storage.db"}
+	Storage = storage.MySQLStorage{User: "root", Password: "temppwd", Address: "localhost:3306", DbName: "mydb"}
 	err = Storage.Init(false)
 	if err != nil {
 		logger.Error.Println(err)

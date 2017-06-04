@@ -7,10 +7,13 @@ import (
 )
 
 type Configuration struct {
-	ListenPort     string
-	LogPath        string
-	MaxSearchPages int
-	ResultsPerPage int
+	ListenPort      string
+	LogPath         string
+	MaxSearchPages  int
+	ResultsPerPage  int
+	ReferencesDepth int
+	RequestTimeout  int
+	WorkersNumber   int
 }
 
 var (

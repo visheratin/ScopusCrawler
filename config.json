@@ -2,5 +2,8 @@
 	"logPath":"D:\\log\\",
 	"listenPort": "12345",
 	"maxSearchPages": 200,
-	"resultsPerPage": 25
+	"resultsPerPage": 25,
+	"referencesDepth": 1,
+	"requestTimeout": 15,
+	"workersNumber": 1
 }

@@ -1,41 +1,41 @@
 package storage
 
-import "github.com/visheratin/scopus-crawler/crawler"
+import "github.com/visheratin/scopus-crawler/models"
 
 // GenericStorage is a general interface for data storage
 type GenericStorage interface {
-	Init() error
+	Init(keepAlive bool) error
 
-	CreateAuthor(author crawler.Author) error
-	UpdateAuthor(author crawler.Author) error
-	GetAuthor(scopusID string) (crawler.Author, error)
-	SearchAuthors(fields map[string]string) ([]crawler.Author, error)
+	CreateAuthor(author models.Author) error
+	UpdateAuthor(author models.Author) error
+	GetAuthor(scopusID string) (models.Author, error)
+	SearchAuthors(fields map[string]string) ([]models.Author, error)
 	DeleteAuthor(scopusID string) error
 
-	CreateAffiliation(affiliation crawler.Affiliation) error
-	UpdateAffiliation(affiliation crawler.Affiliation) error
-	GetAffiliation(scopusID string) (crawler.Affiliation, error)
-	SearchAffiliations(fields map[string]string) ([]crawler.Affiliation, error)
+	CreateAffiliation(affiliation models.Affiliation) error
+	UpdateAffiliation(affiliation models.Affiliation) error
+	GetAffiliation(scopusID string) (models.Affiliation, error)
+	SearchAffiliations(fields map[string]string) ([]models.Affiliation, error)
 	DeleteAffiliation(scopusID string) error
 
-	CreateArticle(article crawler.Article) error
-	UpdateArticle(article crawler.Article) error
-	GetArticle(scopusID string) (crawler.Article, error)
-	SearchArticles(fields map[string]string) ([]crawler.Article, error)
+	CreateArticle(article models.Article) error
+	UpdateArticle(article models.Article) error
+	GetArticle(scopusID string) (models.Article, error)
+	SearchArticles(fields map[string]string) ([]models.Article, error)
 	DeleteArticle(scopusID string) error
 
-	CreateSubjectArea(article crawler.Article) error
-	UpdateSubjectArea(article crawler.Article) error
-	GetSubjectArea(scopusID string) (crawler.SubjectArea, error)
-	SearchSubjectAreas(fields map[string]string) ([]crawler.SubjectArea, error)
+	CreateSubjectArea(area models.SubjectArea) error
+	UpdateSubjectArea(area models.SubjectArea) error
+	GetSubjectArea(scopusID string) (models.SubjectArea, error)
+	SearchSubjectAreas(fields map[string]string) ([]models.SubjectArea, error)
 	DeleteSubjectArea(scopusID string) error
 
-	CreateKeyword(keyword crawler.Keyword) error
-	UpdateKeyword(article crawler.Keyword) error
-	GetKeyword(id string) (crawler.Keyword, error)
-	SearchKeywords(fields map[string]string) ([]crawler.Keyword, error)
+	CreateKeyword(keyword models.Keyword) error
+	UpdateKeyword(article models.Keyword) error
+	GetKeyword(id string) (models.Keyword, error)
+	SearchKeywords(fields map[string]string) ([]models.Keyword, error)
 	DeleteKeyword(id string) error
 
-	CreateFinishedRequest(request string) error
-	CheckFinishedRequest(request string) (bool, error)
+	CreateFinishedRequest(request string, response string) error
+	GetFinishedRequest(request string) (string, error)
 }

@@ -8,12 +8,14 @@ import (
 	"strings"
 
 	"github.com/visheratin/scopus-crawler/config"
+	"github.com/visheratin/scopus-crawler/storage"
 )
 
 type Manager struct {
 	DataSources []DataSource
 	Queue       chan SearchRequest
 	WorkerQueue chan chan SearchRequest
+	Storage     storage.GenericStorage
 }
 
 func (manager *Manager) Init(dataSourcesPath string, workersNumber int) error {
@@ -27,6 +29,7 @@ func (manager *Manager) Init(dataSourcesPath string, workersNumber int) error {
 
 	for i := 0; i < workersNumber; i++ {
 		worker := Worker{
+			DataSources: ds,
 			Work:        make(chan SearchRequest),
 			WorkerQueue: manager.WorkerQueue,
 		}
@@ -125,7 +128,7 @@ func (manager *Manager) StartCrawling(req SearchRequest) error {
 	}
 	searchFields := formSearchField(fieldsPart, firstKey, pagesField)
 	for _, f := range searchFields {
-		workerReq := SearchRequest{SourceName: req.SourceName, Fields: f}
+		workerReq := SearchRequest{SourceName: req.SourceName, Source: dataSource, Fields: f}
 		manager.Queue <- workerReq
 	}
 	return nil

@@ -8,6 +8,11 @@ import (
 	"github.com/visheratin/scopus-crawler/config"
 	"github.com/visheratin/scopus-crawler/crawler"
 	"github.com/visheratin/scopus-crawler/logger"
+	"github.com/visheratin/scopus-crawler/storage"
+)
+
+var (
+	Storage storage.GenericStorage
 )
 
 func main() {
@@ -16,9 +21,16 @@ func main() {
 		fmt.Println(err)
 		return
 	}
+	Storage = storage.SQLiteStorage{Path: "storage.db"}
+	err = Storage.Init(false)
+	if err != nil {
+		logger.Error.Println(err)
+	}
 	config.InitKeys("keys.txt")
+	config, _ := config.ReadConfig("config.json")
 	manager := crawler.Manager{}
-	manager.Init("data-sources.json", 4)
+	manager.Storage = Storage
+	manager.Init("data-sources.json", config.WorkersNumber)
 	req, err := readRequest("request.json")
 	if err != nil {
 		logger.Error.Println(err)
@@ -30,16 +42,6 @@ func main() {
 		return
 	}
 	fmt.Scanln()
-	// address := "http://api.elsevier.com/content/serial/title"
-	// params := map[string]string{}
-	// params["httpAccept"] = "application/json"
-	// params["apiKey"] = "bd9ddf64bbcc7ed6d09ddcc16d607d75"
-	// params["start"] = "50"
-	// data, err := query.MakeQuery(address, params)
-	// if err != nil {
-	// 	logger.Error.Println(err)
-	// }
-	// fmt.Println(data["serial-metadata-response"])
 }
 
 func readRequest(requestPath string) (crawler.SearchRequest, error) {

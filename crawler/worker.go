@@ -23,13 +23,15 @@ type Worker struct {
 
 func (worker *Worker) Start() {
 	go func() {
+		worker.Config, _ = config.ReadConfig("config.json")
+		worker.Config.InitKeys("keys.txt")
 		for {
 			worker.WorkerQueue <- worker.Work
 			work := <-worker.Work
 			ds := work.Source
 			switch work.SourceName {
 			case "search":
-				data, err := query.MakeQuery(ds.Path, "", work.Fields, worker.Config.RequestTimeout, worker.Storage)
+				data, err := query.MakeQuery(ds.Path, "", work.Fields, worker.Config.RequestTimeout, worker.Storage, worker.Config)
 				if err != nil {
 					logger.Error.Println(err)
 					return
@@ -175,7 +177,8 @@ func (worker *Worker) ExtractArticles(rawResponse map[string]interface{}) ([]mod
 }
 
 func (worker *Worker) ProceedArticle(article models.Article, articleDs DataSource, depth int) error {
-	articleData, err := query.MakeQuery(articleDs.Path, article.ScopusID, map[string]string{}, worker.Config.RequestTimeout, worker.Storage)
+	articleData, err := query.MakeQuery(articleDs.Path, article.ScopusID, map[string]string{}, worker.Config.RequestTimeout,
+		worker.Storage, worker.Config)
 	if err != nil {
 		logger.Error.Println("Error on requesting data for id=" + article.ScopusID)
 		logger.Error.Println(err)

@@ -7,6 +7,7 @@ import (
 )
 
 type Configuration struct {
+	keys            []string
 	ListenPort      string
 	LogPath         string
 	MaxSearchPages  int

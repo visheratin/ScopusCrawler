@@ -188,7 +188,7 @@ func (storage MySQLStorage) CreateAffiliation(affiliation models.Affiliation) er
 	if err != nil {
 		return err
 	}
-	req, _ := db.Prepare("INSERT OR REPLACE INTO affiliations VALUES (?, ?, ?, ?, ?, ?, ?)")
+	req, _ := db.Prepare("REPLACE INTO affiliations VALUES (?, ?, ?, ?, ?, ?, ?)")
 	_, err = req.Exec(affiliation.ScopusID, affiliation.Title, affiliation.Country, affiliation.City,
 		affiliation.State, affiliation.PostalCode, affiliation.Address)
 	if err != nil {
@@ -280,7 +280,7 @@ func (storage MySQLStorage) CreateArticle(article models.Article) error {
 	if err != nil {
 		return err
 	}
-	req, _ := db.Prepare("INSERT OR REPLACE INTO articles VALUES (?, ?, ?, ?, ?, ?, ?)")
+	req, _ := db.Prepare("REPLACE INTO articles VALUES (?, ?, ?, ?, ?, ?, ?)")
 	_, err = req.Exec(article.ScopusID, article.Title, article.Abstracts, article.PublicationDate,
 		article.CitationsCount, article.PublicationType, article.PublicationTitle)
 	if err != nil {
@@ -433,7 +433,7 @@ func (storage MySQLStorage) CreateAuthor(author models.Author) error {
 	if err != nil {
 		return err
 	}
-	req, _ := db.Prepare("INSERT OR REPLACE INTO authors VALUES (?, ?, ?, ?, ?, ?)")
+	req, _ := db.Prepare("REPLACE INTO authors VALUES (?, ?, ?, ?, ?, ?)")
 	_, err = req.Exec(author.ScopusID, author.AffiliationID, author.Initials,
 		author.IndexedName, author.Surname, author.Name)
 	if err != nil {
@@ -525,7 +525,7 @@ func (storage MySQLStorage) CreateFinishedRequest(request string, response strin
 	if err != nil {
 		return err
 	}
-	req, _ := db.Prepare("INSERT OR REPLACE INTO finished_requests VALUES (?, ?)")
+	req, _ := db.Prepare("REPLACE INTO finished_requests VALUES (?, ?)")
 	_, err = req.Exec(request, response)
 	if err != nil {
 		return err
@@ -558,7 +558,7 @@ func (storage MySQLStorage) CreateKeyword(keyword models.Keyword) error {
 	if err != nil {
 		return err
 	}
-	req, _ := db.Prepare("INSERT OR REPLACE INTO keywords VALUES (?, ?)")
+	req, _ := db.Prepare("REPLACE INTO keywords VALUES (?, ?)")
 	_, err = req.Exec(keyword.ID, keyword.Value)
 	if err != nil {
 		return err
@@ -645,7 +645,7 @@ func (storage MySQLStorage) CreateSubjectArea(subjectArea models.SubjectArea) er
 	if err != nil {
 		return err
 	}
-	req, _ := db.Prepare("INSERT OR REPLACE INTO subject_areas VALUES (?, ?, ?, ?)")
+	req, _ := db.Prepare("REPLACE INTO subject_areas VALUES (?, ?, ?, ?)")
 	_, err = req.Exec(subjectArea.ScopusID, subjectArea.Title, subjectArea.Code, subjectArea.Description)
 	if err != nil {
 		return err

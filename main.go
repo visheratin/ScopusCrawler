@@ -26,7 +26,6 @@ func main() {
 	if err != nil {
 		logger.Error.Println(err)
 	}
-	config.InitKeys("keys.txt")
 	config, _ := config.ReadConfig("config.json")
 	manager := crawler.Manager{}
 	manager.Storage = Storage

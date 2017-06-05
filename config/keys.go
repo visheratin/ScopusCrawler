@@ -6,11 +6,7 @@ import (
 	"os"
 )
 
-var (
-	keys []string
-)
-
-func InitKeys(path string) error {
+func (config *Configuration) InitKeys(path string) error {
 	file, err := os.Open(path)
 	if err != nil {
 		return err
@@ -22,19 +18,19 @@ func InitKeys(path string) error {
 	for scanner.Scan() {
 		lines = append(lines, scanner.Text())
 	}
-	keys = lines
+	config.keys = lines
 	return scanner.Err()
 }
 
-func GetKey() string {
-	index := rand.Intn(len(keys))
-	return keys[index]
+func (config *Configuration) GetKey() string {
+	index := rand.Intn(len(config.keys))
+	return config.keys[index]
 }
 
-func RemoveKey(key string) {
-	for i := 0; i < len(keys); i++ {
-		if keys[i] == key {
-			keys = append(keys[:i], keys[i+1:]...)
+func (config *Configuration) RemoveKey(key string) {
+	for i := 0; i < len(config.keys); i++ {
+		if config.keys[i] == key {
+			config.keys = append(config.keys[:i], config.keys[i+1:]...)
 			return
 		}
 	}

@@ -1,5 +1,5 @@
 {
-    "sourceName": "articles",
+    "sourceName": "search",
     "fields":
     {
         "subj": "COMP,MATH,SOCI",

@@ -32,6 +32,7 @@ func (manager *Manager) Init(dataSourcesPath string, workersNumber int) error {
 			DataSources: ds,
 			Work:        make(chan SearchRequest),
 			WorkerQueue: manager.WorkerQueue,
+			Storage:     manager.Storage,
 		}
 		worker.Start()
 		go func() {
@@ -141,7 +142,7 @@ func formPagesSearchField() []map[string]string {
 	for i := 0; i < config.MaxSearchPages; i++ {
 		item := map[string]string{}
 		item["start"] = strconv.Itoa(counter)
-		result = append(result, item)
+		result[i] = item
 		counter += config.ResultsPerPage
 	}
 	return result

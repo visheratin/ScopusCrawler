@@ -1,17 +1,17 @@
 [
     {
         "name": "search",
-        "path": "http://api.elsevier.com/content/search/scopus?sort=citedby-count&httpAccept=application/json&view=COMPLETE",
+        "path": "http://api.elsevier.com/content/search/scopus?sort=citedby-count&httpAccept=application/json&view=COMPLETE&",
         "keys": ["query", "date", "subj"]
     },
     {
         "name": "article",
-        "path": "http://api.elsevier.com/content/abstract/scopus_id/{_id_}?httpAccept=application/json&view=FULL",
+        "path": "http://api.elsevier.com/content/abstract/scopus_id/{_id_}?httpAccept=application/json&view=FULL&",
         "keys": []
     },
     {
         "name": "author",
-        "path": "http://api.elsevier.com/content/author/author_id/{_id_}?httpAccept=application/json&view=ENHANCED",
+        "path": "http://api.elsevier.com/content/author/author_id/{_id_}?httpAccept=application/json&view=ENHANCED&",
         "keys": []
     }
 ]

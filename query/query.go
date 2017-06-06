@@ -29,7 +29,7 @@ func MakeQuery(address string, id string, params map[string]string, timeoutSec i
 	if finishedRequest == "" {
 		request := requestPath
 		authKey := config.GetKey()
-		requestPath = requestPath + "authKey=" + authKey
+		requestPath = requestPath + "apiKey=" + authKey
 		fmt.Println(requestPath)
 		req, err := http.NewRequest("GET", requestPath, nil)
 		if err != nil {

@@ -2,6 +2,7 @@
     "sourceName": "search",
     "fields":
     {
+        "query": "PUBYEAR%20AFT%201904",
         "subj": "COMP,MATH,SOCI",
         "date": "2001-2005"
     }

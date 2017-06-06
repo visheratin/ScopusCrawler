@@ -102,25 +102,27 @@ func (manager *Manager) StartCrawling(req SearchRequest) error {
 		} else {
 			rangeParts := strings.Split(value, "-")
 			if len(rangeParts) != 2 {
-				return errors.New("search range for key " + key + " was specified incorrectly: " + value)
+				fieldsPart[key] = setParts
+				// return errors.New("search range for key " + key + " was specified incorrectly: " + value)
+			} else {
+				start, err := strconv.Atoi(rangeParts[0])
+				if err != nil {
+					return err
+				}
+				finish, err := strconv.Atoi(rangeParts[1])
+				if err != nil {
+					return err
+				}
+				if start > finish {
+					return errors.New("range error for key " + key + ": start value must be less or equal than finish value")
+				}
+				rangeSlice := make([]string, finish-start+1)
+				for i := range rangeSlice {
+					val := strconv.Itoa(start + i)
+					rangeSlice[i] = val
+				}
+				fieldsPart[key] = rangeSlice
 			}
-			start, err := strconv.Atoi(rangeParts[0])
-			if err != nil {
-				return err
-			}
-			finish, err := strconv.Atoi(rangeParts[1])
-			if err != nil {
-				return err
-			}
-			if start > finish {
-				return errors.New("range error for key " + key + ": start value must be less or equal than finish value")
-			}
-			rangeSlice := make([]string, finish-start+1)
-			for i := range rangeSlice {
-				val := strconv.Itoa(start + i)
-				rangeSlice[i] = val
-			}
-			fieldsPart[key] = rangeSlice
 		}
 	}
 	pagesField := []map[string]string{}
